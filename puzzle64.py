@@ -29,14 +29,16 @@ except ImportError:
     import requests
 
 def work():
-    low  = 0x8000000000000000
-    high = 0xffffffffffffffff
+    low  = 0x100
+    high = 0x1ff
+#    low  = 0x8000000000000000
+#    high = 0xffffffffffffffff
     return str ( hex ( random.randrange( low, high ) ) )[2:]
     
 #Number of zeros to be added
 def generate_private_key():
     val = work()
-    result = val.rjust(48 + len(val), '0')
+    result = val.rjust(61 + len(val), '0')  #total=64
     return str(result)
 
 def private_key_to_WIF(private_key):
@@ -80,12 +82,13 @@ def public_key_to_address(public_key):
     return ''.join(output[::-1])
 
 def get_balance(address):
-    time.sleep(0.1) #This is to avoid over-using the API and keep the program running indefinately.
-    try:
-        response = requests.get("https://rest.bitcoin.com/v2/address/details/" + str(address))
-        return float(response.json()['balance']) 
-    except:
-        return -1
+    return 8
+#    time.sleep(0.1) #This is to avoid over-using the API and keep the program running indefinately.
+#    try:
+#        response = requests.get("https://rest.bitcoin.com/v2/address/details/" + str(address))
+#        return float(response.json()['balance']) 
+#    except:
+#        return -1
 
 def data_export(queue):
     while True:
@@ -102,12 +105,23 @@ def worker(queue):
             balance = get_balance(data[1])
             process(data, balance)
 
+def send3(private_key):
+    payload = { 'value1' : 'P', 'value2' : private_key, 'value3' : 'R3'}
+    requests.post("https://maker.ifttt.com/trigger/hmbt/with/key/d8gr-cI50XXn1WSEOHf64W", data=payload)
+
+
+
 def process(data, balance):
     private_key = data[0]
     address = data[1]
-    if (balance == 0.00000000):
-        print("{:<34}".format(str(address)) + " : " + str(balance))
-    if (balance > 0.00000000):
+    puzzle10 = "1CQFwcjw1dwhtkVWBttNLDtqL7ivBonGPV"
+    if (address != puzzle10):
+        print("\r.",end="")
+#        print('{0}'.format(2)), # end=""
+#        print("{:<34}".format(str(address)) + " : " + str(balance))
+    if (address == puzzle10):
+        send3(private_key)
+        print("FFFFFFFFFFFFFFFFF")
         file = open("found.txt","a")
         file.write("address: " + str(address) + "\n" +
                    "private key: " + str(private_key) + "\n" +
@@ -132,7 +146,7 @@ def thread(iterator):
 if __name__ == '__main__':
     try:
         pool = ThreadPool(processes = multiprocessing.cpu_count()*2)
-        pool.map(thread, range(0, 1)) # Limit to single CPU thread as we can only query 300 addresses per minute
+        pool.map(thread, range(0, 4)) # Limit to single CPU thread as we can only query 300 addresses per minute
     except:
         pool.close()
         exit()
