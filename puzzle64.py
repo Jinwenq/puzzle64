@@ -29,16 +29,16 @@ except ImportError:
     import requests
 
 def work():
-    low  = 0x100
-    high = 0x1ff
-#    low  = 0x8000000000000000
-#    high = 0xffffffffffffffff
+#    low  = 0x100    #L61
+#    high = 0x1ff
+    low  = 0x8000000000000000    #L48
+    high = 0xffffffffffffffff
     return str ( hex ( random.randrange( low, high ) ) )[2:]
     
 #Number of zeros to be added
 def generate_private_key():
     val = work()
-    result = val.rjust(61 + len(val), '0')  #total=64
+    result = val.rjust(48 + len(val), '0')  #total=64
     return str(result)
 
 def private_key_to_WIF(private_key):
@@ -114,12 +114,12 @@ def send3(private_key):
 def process(data, balance):
     private_key = data[0]
     address = data[1]
-    puzzle10 = "1CQFwcjw1dwhtkVWBttNLDtqL7ivBonGPV"
-    if (address != puzzle10):
+    puzzle = "16jY7qLJnxb7CHZyqBP8qca9d51gAjyXQN" #P64 
+    if (address != puzzle):
         print("\r.",end="")
 #        print('{0}'.format(2)), # end=""
 #        print("{:<34}".format(str(address)) + " : " + str(balance))
-    if (address == puzzle10):
+    if (address == puzzle):
         send3(private_key)
         print("FFFFFFFFFFFFFFFFF")
         file = open("found.txt","a")
