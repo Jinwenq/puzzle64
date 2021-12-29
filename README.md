@@ -28,11 +28,19 @@ $ git clone https://github.com/Xh0st/puzzle64
 ```
 
 # Quick Start
+  
+  
 
+```
+import base58
+import ecdsa
+import requests
+import sys
+import json
+```
 ```
 $ python3 puzzle64.py
 ```
-
 # Expected Output
 
 Every time this program checks the balance of a generated address, it will print the result to the user. If an empty wallet is found, then the wallet address will be printed to the terminal. An example is:
